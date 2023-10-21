@@ -1,8 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/Login.dart'; // Import your LoginPage
 import 'package:neighbor_nexus/chat_screen.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/firebase_options.dart';
+import 'package:neighbor_nexus/map_view.dart';
 import 'package:neighbor_nexus/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -77,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfilePage()));
                 // Implement navigation to other screens here
               },
-              child: const Text('Go to Other Screen'),
+              child: const Text('Go to user'),
             ),
             
             ElevatedButton(
@@ -85,7 +88,14 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatScreen(recipientUid: 'xotUbLqy0wMo6wuoo3HQRMmAqA03',)));
                 // Implement navigation to other screens here
               },
-              child: const Text('Go to Other Screen'),
+              child: const Text('Go to chat'),
+            ),
+                        ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventMap()));
+                // Implement navigation to other screens here
+              },
+              child: const Text('Go to map'),
             ),
           ],
         ),
