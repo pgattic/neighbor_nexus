@@ -38,7 +38,7 @@ class EventDetailPage extends StatelessWidget {
                   SizedBox(height: 10),
                   Text('Date and Time: ${event.dateTime.toString()}'),
                   SizedBox(height: 10),
-                  Text('User ID: ${event.userId}'),
+                  Text('Description: ${event.description}'),
                 ],
               ),
             ),
