@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/main.dart';
-import 'package:neighbor_nexus/signup.dart';
+import 'package:neighbor_nexus/signup.dart'; // Import your SignUpPage
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -24,19 +24,32 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Image.asset(
+              'assets/images/logo.png',
+              width: 150, // Adjust the size as needed
+              height: 150, // Adjust the size as needed
+            ),
+            const SizedBox(height: 16), // Add spacing
+            const Text(
+              'Login',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your email';
@@ -44,9 +57,15 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 },
               ),
+              const SizedBox(height: 8), // Add more spacing
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your password';
@@ -55,6 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 obscureText: true,
               ),
+              const SizedBox(height: 8), // Add more spacing
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -67,9 +87,10 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 child: const Text('Login'),
               ),
+              const SizedBox(height: 50),
               TextButton(
                 onPressed: () {
-                  // Navigate to the signup page
+                  // Navigate to the sign-up page
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpPage()));
                 },
                 child: const Text("Don't have an account? Sign Up"),
