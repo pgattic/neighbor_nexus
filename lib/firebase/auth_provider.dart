@@ -164,8 +164,9 @@ class MessageService {
 class Event {
   final String eventId;
   final String title;
-  final String dateTime;
+  final DateTime dateTime;
   final String description;
+  final String eventType;
   final double latitude;
   final double longitude;
   final String userId;
@@ -175,9 +176,24 @@ class Event {
     required this.title,
     required this.dateTime,
     required this.description,
+    required this.eventType,
     required this.latitude,
     required this.longitude,
     required this.userId,
   });
+
+  // Convert Event to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'eventId': eventId,
+      'title': title,
+      'dateTime': dateTime,
+      'description': description,
+      'latitude': latitude,
+      'longitude': longitude,
+      'eventType': eventType,
+      'userId': userId,
+    };
+  }
 }
 
