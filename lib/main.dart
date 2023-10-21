@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/Login.dart'; // Import your LoginPage
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/firebase_options.dart';
-import 'package:neighbor_nexus/signup.dart';
+import 'package:neighbor_nexus/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
             const Text('Welcome to your app!'),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserPage()));
                 // Implement navigation to other screens here
               },
               child: const Text('Go to Other Screen'),
