@@ -1,5 +1,5 @@
 # neighbor_nexus
-
+https://discord.gg/ScK6pR7Q
 A new Flutter project.
 
 ## Getting Started
