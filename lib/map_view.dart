@@ -19,6 +19,14 @@ class _EventMapState extends State<EventMap> {
   final CollectionReference events = FirebaseFirestore.instance.collection('events');
 
   @override
+  void initState() {
+    super.initState();
+    _initialization.then((value) {
+      _retrieveEventsFromFirebase();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _initialization,
@@ -28,7 +36,6 @@ class _EventMapState extends State<EventMap> {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          _retrieveEventsFromFirebase();
           return Scaffold(
             body: GoogleMap(
               onMapCreated: (GoogleMapController controller) {
