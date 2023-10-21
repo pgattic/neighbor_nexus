@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:neighbor_nexus/firebase/auth_provider.dart';
+
+// Placeholder for AuthProvider
+
+
 
 class EventMap extends StatefulWidget {
   @override
@@ -12,9 +18,13 @@ class _EventMapState extends State<EventMap> {
   late GoogleMapController mapController;
   Set<Marker> markers = {};
 
-  // Firebase setup
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-  CollectionReference events = FirebaseFirestore.instance.collection('events');
+  final CollectionReference events = FirebaseFirestore.instance.collection('events');
+
+  late String selectedMonth;
+  late String selectedDay;
+  late String selectedYear;
+  late String selectedTime;
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +43,7 @@ class _EventMapState extends State<EventMap> {
                 mapController = controller;
               },
               markers: markers,
-              onLongPress: (LatLng latLng) {
-                _addEventDialog(latLng);
-              },
+              onLongPress: _addEventDialog,
               initialCameraPosition: const CameraPosition(
                 target: LatLng(37.42796133580664, -122.085749655962),
                 zoom: 14.4746,
@@ -44,252 +52,161 @@ class _EventMapState extends State<EventMap> {
           );
         }
 
-        return CircularProgressIndicator(); // Loading indicator until Firebase is initialized
+        return CircularProgressIndicator();
       },
     );
   }
 
-  void _addEventDialog(LatLng latLng) {
-    final TextEditingController title = TextEditingController();
-    final TextEditingController description = TextEditingController();
-    const List<String> list = <String>['One', 'Two', 'Three', 'Four'];
-    var dropdownValue = list[0];
-    var newEvent = EventDetails();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return AlertDialog(
-        //   title: Text('Add Event'),
-        //   content: EventInputDialog(latLng: latLng),
-        //   actions: <Widget>[
-        //     TextButton(
-        //       onPressed: () {
-        //         final formState = context.findAncestorStateOfType<FormState>();
-        //         if (formState != null && formState.validate()) {
-        //           formState.save();
-        //           _addEventToMap(latLng, EventDetails());
-        //           Navigator.of(context).pop();
-        //         }
-        //       },
-        //       child: Text('Add'),
-        //     ),
-        //   ],
-        // );
-        return AlertDialog(
-        title: const Text("New Event"),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: title,
-              decoration: InputDecoration(
-                labelText: 'Title',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
+  void _retrieveEventsFromFirebase() {
+    events.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((document) {
+        final eventData = document.data() as Map<String, dynamic>;
+        final event = Event(
+          eventId: eventData['eventId'],
+          title: eventData['title'],
+          dateTime: (eventData['dateTime'] as Timestamp).toDate(),
+          description: eventData['description'],
+          latitude: eventData['latitude'],
+          longitude: eventData['longitude'],
+          eventType: eventData['eventType'],
+          userId: eventData['userId'],
+        );
+        setState(() {
+          markers.add(
+            Marker(
+              markerId: MarkerId(event.eventId),
+              position: LatLng(event.latitude, event.longitude),
+              infoWindow: InfoWindow(title: event.title, snippet: event.description),
             ),
-            TextFormField(
-              controller: description,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-            DropdownMenu<String>(
-              initialSelection: list.first,
-              onSelected: (String? value) {
-                // This is called when the user selects an item.
-                setState(() {
-                  dropdownValue = value!;
-                });
-              },
-              dropdownMenuEntries:
-                  list.map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(value: value, label: value);
-              }).toList(),
-            )
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'Cancel'),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => {
-              newEvent.title = title.text,
-              newEvent.description = description.text,
-              newEvent.eventType = dropdownValue,
-              _addEventToMap(latLng, newEvent),
-              Navigator.pop(context, 'OK')
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      );
-      },
-    );
-  }
-
-  void _addEventToMap(LatLng latLng, EventDetails eventDetails) async {
-    // Add the event to the map
-    markers.add(
-      Marker(
-        markerId: MarkerId(latLng.toString()),
-        position: latLng,
-        infoWindow: InfoWindow(
-          title: eventDetails.title,
-          snippet: eventDetails.description,
-        ),
-        // Additional properties like title, snippet, icon, etc. can be added here
-      ),
-    );
-
-    // Add the event to Firebase
-    await FirebaseFirestore.instance.collection('events').add({
-      'title': eventDetails.title,
-      'description': eventDetails.description,
-      'eventType': eventDetails.eventType,
-//      'dateTime': eventDetails.dateTime,
-      'latitude': latLng.latitude,
-      'longitude': latLng.longitude,
+          );
+        });
+      });
     });
-
-    setState(() {});
   }
 
-  void _retrieveEventsFromFirebase() async {
-    // Logic to retrieve events from Firebase and update the map accordingly
-    QuerySnapshot querySnapshot = await events.get();
-
-    querySnapshot.docs.forEach((doc) {
-      // Extract necessary data
-      String title = doc['title'];
-      String description = doc['description'];
-      String eventType = doc['eventType'];
-//      DateTime dateTime = doc['dateTime'].toDate(); // Convert Timestamp to DateTime
-      double latitude = doc['latitude'];
-      double longitude = doc['longitude'];
-
-      // Update the map accordingly
+  void _addEventToMap(LatLng latLng, Event event) {
+    setState(() {
       markers.add(
         Marker(
-          markerId: MarkerId(doc.id),
-          position: LatLng(latitude, longitude),
-          infoWindow: InfoWindow(
-            title: title,
-            snippet: description,
-          ),
-          // Additional properties like title, snippet, icon, etc. can be added here
+          markerId: MarkerId(event.eventId),
+          position: latLng,
+          infoWindow: InfoWindow(title: event.title, snippet: event.description),
         ),
       );
     });
-
-    setState(() {});
+    events.add(event.toMap());
   }
-}
 
-class EventDetails {
-  late String title;
-  late String description;
-  late String eventType;
-//  late DateTime dateTime;
-}
+void _addEventDialog(LatLng latLng) {
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
 
-class EventInputDialog extends StatefulWidget {
-  final LatLng latLng;
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  const List<String> eventTypes = <String>['One', 'Two', 'Three', 'Four'];
+  var selectedEventType = eventTypes[0];
 
-  EventInputDialog({required this.latLng});
-
-  @override
-  _EventInputDialogState createState() => _EventInputDialogState();
-}
-
-class _EventInputDialogState extends State<EventInputDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final EventDetails eventDetails = EventDetails();
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Title'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a title';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              eventDetails.title = value!;
-            },
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      final user = Provider.of<AuthProvider>(context).user;
+      final userID = user!.uid;
+      return StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text("New Event"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                  ),
+                ),
+                TextFormField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                  ),
+                ),
+                DropdownButton<String>(
+                  value: selectedEventType,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedEventType = newValue!;
+                    });
+                  },
+                  items: eventTypes.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                Text('Selected Date: ${selectedDate.toLocal().toString().split(' ')[0]}'),
+                Text('Selected Time: ${selectedTime.format(context)}'),
+                ElevatedButton(
+                  child: Text('Select Date and Time'),
+                  onPressed: () async {
+                    final DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null) {
+                      final TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (pickedTime != null) {
+                        setState(() {
+                          selectedDate = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+                          selectedTime = pickedTime;
+                        });
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Description'),
-            onSaved: (value) {
-              eventDetails.description = value!;
-            },
-          ),
-          DropdownButtonFormField<String>(
-            decoration: InputDecoration(labelText: 'Event Type'),
-            value: eventDetails.eventType,
-            items: <String>['Meeting', 'Party', 'Other']
-                .map<DropdownMenuItem<String>>(
-              (String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _addEventToMap(
+                  latLng,
+                  Event(
+                    eventId: DateTime.now().millisecondsSinceEpoch.toString(),
+                    title: titleController.text,
+                    dateTime: selectedDate,
+                    description: descriptionController.text,
+                    latitude: latLng.latitude,
+                    longitude: latLng.longitude,
+                    eventType: selectedEventType,
+                    userId: userID,
+                  ),
                 );
+                Navigator.pop(context);
               },
-            ).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                eventDetails.eventType = newValue!;
-              });
-            },
-            onSaved: (value) {
-              eventDetails.eventType = value!;
-            },
-          ),
-          // TextFormField(
-          //   decoration: InputDecoration(labelText: 'Date and Time'),
-          //   onTap: () async {
-          //     DateTime? picked = await showDatePicker(
-          //       context: context,
-          //       initialDate: DateTime.now(),
-          //       firstDate: DateTime.now(),
-          //       lastDate: DateTime(2101),
-          //     );
-          //     if (picked != null) {
-          //       TimeOfDay? time = await showTimePicker(
-          //         context: context,
-          //         initialTime: TimeOfDay.now(),
-          //       );
-          //       if (time != null) {
-          //         setState(() {
-          //           eventDetails.dateTime = DateTime(
-          //             picked.year,
-          //             picked.month,
-          //             picked.day,
-          //             time.hour,
-          //             time.minute,
-          //           );
-          //         });
-          //       }
-          //     }
-          //   },
-          // ),
-        ],
-      ),
-    );
-  }
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 }
