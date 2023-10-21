@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAaGQm46o0m8mr_os66sEtLkJDlzV1WsaI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>398602524498</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.neighborNexus.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>neighbornexus-aaf99</string>
+	<key>STORAGE_BUCKET</key>
+	<string>neighbornexus-aaf99.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:398602524498:ios:a0b72c351e2de9d23d8c8b</string>
+</dict>
+</plist>
