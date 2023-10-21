@@ -241,7 +241,7 @@ class EventPopup extends StatelessWidget {
             ),
             SizedBox(height: 10.0),
             Text(
-              'Date and Time: ${_formatDateTime(event.dateTime)}',
+              '${_formatDateTime(event.dateTime)}',
               style: TextStyle(fontSize: 16), // Adjust the font size
             ),
             SizedBox(height: 10.0),
@@ -258,12 +258,16 @@ class EventPopup extends StatelessWidget {
                 ));
               },
               style: ElevatedButton.styleFrom(
+                primary: Colors.blue, // Set the button background color
                 padding: EdgeInsets.all(16.0), // Add padding all around the button
                 minimumSize: Size(200, 50), // Set a minimum button size
               ),
               child: Text(
                 'Go to Event',
-                style: TextStyle(fontSize: 18), // Adjust the button text font size
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white, // Adjust the button text color
+                ),
               ),
             ),
           ],
@@ -290,7 +294,6 @@ class DateFormat {
     final year = dateTime.year;
     final hour = dateTime.hour;
     final minute = dateTime.minute;
-
 
     return '$month $day, $year at $hour:$minute';
   }

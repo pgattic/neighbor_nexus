@@ -93,8 +93,14 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  Future<void> _initializeChatMessages() async {
-    final messages = await _messageService.getChatMessages(chatId!).first;
+Future<void> _initializeChatMessages() async {
+  final messages = await _messageService.getChatMessages(chatId!).first;
+
+  if (messages.docs.isEmpty) {
+    // Handle the case when there are no messages in the chat.
+    // You can show a message or handle it according to your app's requirements.
+    print('No messages in this chat.');
+  } else {
     _chatMessages = messages.docs.map((message) {
       return Message(
         senderId: message['senderId'],
@@ -103,8 +109,13 @@ class _ChatScreenState extends State<ChatScreen> {
         timestamp: message['timestamp'].toDate(),
       );
     }).toList();
+
+    // Reverse the messages list to display the most recent messages at the bottom
+    _chatMessages = _chatMessages.reversed.toList();
     setState(() {});
   }
+}
+
 
   @override
   void dispose() {
