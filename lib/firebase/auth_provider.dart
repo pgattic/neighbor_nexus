@@ -109,6 +109,10 @@ class User {
     required this.eventIds,
   });
 
+  setEventIds(List<String> eventIds, {required String value}) {
+  eventIds.add(value);
+  }
+
 
   iconURL({required String newIconURL}) {
     icon = newIconURL;
@@ -151,3 +155,24 @@ class MessageService {
         .snapshots();
   }
 }
+
+class Event {
+  final String eventId;
+  final String title;
+  final String dateTime;
+  final String description;
+  final double latitude;
+  final double longitude;
+  final String userId;
+
+  Event({
+    required this.eventId,
+    required this.title,
+    required this.dateTime,
+    required this.description,
+    required this.latitude,
+    required this.longitude,
+    required this.userId,
+  });
+}
+

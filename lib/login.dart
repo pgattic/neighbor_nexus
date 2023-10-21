@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
+import 'package:neighbor_nexus/main.dart';
 import 'package:neighbor_nexus/map_view.dart';
 import 'package:neighbor_nexus/signup.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (authProvider.user != null) {
       // If the user is already signed in, navigate to the main page
-      return MapSample();
+      return HomeScreen();
     }
 
     return Scaffold(
