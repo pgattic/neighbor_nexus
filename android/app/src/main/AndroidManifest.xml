@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="neighbor_nexus"
+        android:label="Neighborhood Nexus"
         android:name="${applicationName}"
         android:icon="@drawable/logo">
         <activity
