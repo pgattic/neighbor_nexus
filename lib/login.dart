@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
-import 'package:neighbor_nexus/main.dart';
-import 'package:neighbor_nexus/signup.dart'; // Import your SignUpPage
+import 'package:neighbor_nexus/map_view.dart';
+import 'package:neighbor_nexus/signup.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,13 +14,16 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // Add a variable to track the password reset message.
+  String _passwordResetMessage = '';
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
     if (authProvider.user != null) {
       // If the user is already signed in, navigate to the main page
-      return HomeScreen();
+      return MapSample();
     }
 
     return Scaffold(
@@ -32,16 +35,16 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset(
-              'assets/images/logo.png',
-              width: 150, // Adjust the size as needed
-              height: 150, // Adjust the size as needed
-            ),
-            const SizedBox(height: 16), // Add spacing
-            const Text(
-              'Login',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
+                'assets/images/logo.png',
+                width: 150, // Adjust the size as needed
+                height: 150, // Adjust the size as needed
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Login',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -57,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 8), // Add more spacing
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -74,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 obscureText: true,
               ),
-              const SizedBox(height: 8), // Add more spacing
+              const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -87,18 +90,45 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 child: const Text('Login'),
               ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  // Implement password reset function
+                  _resetPassword(_emailController.text);
+                },
+                child: const Text('Forgot Password'),
+              ),
               const SizedBox(height: 50),
               TextButton(
                 onPressed: () {
                   // Navigate to the sign-up page
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpPage()));
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => SignUpPage()));
                 },
                 child: const Text("Don't have an account? Sign Up"),
               ),
+              // Display the password reset message.
+              Text(_passwordResetMessage, style: TextStyle(color: Colors.green)),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // Function to reset the user's password.
+  void _resetPassword(String email) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.resetPassword(email).then((result) {
+      // Display a message to the user.
+      setState(() {
+        _passwordResetMessage = 'Password reset email sent to $email';
+      });
+    }).catchError((error) {
+      // Handle error and display an error message.
+      setState(() {
+        _passwordResetMessage = 'Error: $error';
+      });
+    });
   }
 }

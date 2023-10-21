@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/login.dart';
+import 'package:neighbor_nexus/main.dart';
 import 'package:provider/provider.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -74,6 +75,7 @@ class SignUpPage extends StatelessWidget {
                   password: passwordController.text,
                   displayName: displayNameController.text,
                 );
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
               },
               child: const Text('Sign Up'),
             ),
