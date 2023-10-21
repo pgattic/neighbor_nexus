@@ -79,11 +79,11 @@ Future<void> login({required String email, required String password}) async {
 
 
 class User {
-  final String uid;
-  final String email;
-  final String displayName;
-  final String icon;
-  final List<String> eventIds;
+  String uid;
+  String email;
+  String displayName;
+  String icon;
+  List<String> eventIds;
 
   User({required this.uid, required this.email, required this.displayName, required this.icon, required this.eventIds});
 }
