@@ -43,6 +43,9 @@ dependencies:
   firebase_storage: ^11.3.1
   image_picker: ^1.0.4
   custom_info_window: ^1.0.1
+  flutter_cache_manager: ^3.3.1
+  cached_network_image: ^3.3.0
+  fluttertoast: ^8.2.2
 
 
 dev_dependencies:
