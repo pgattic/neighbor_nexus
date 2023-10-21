@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>com.google.android.geo.API_KEY</key>
+	<string>AIzaSyAzgaFfoBZ6QjuylscW2OZXM1TZzxS83yk</string>
 </dict>
 </plist>
