@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "398602524498",
-    "project_id": "neighbornexus-aaf99",
-    "storage_bucket": "neighbornexus-aaf99.appspot.com"
+    "project_number": "945595306234",
+    "project_id": "neighborhoodnexus-57ac2",
+    "storage_bucket": "neighborhoodnexus-57ac2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:398602524498:android:fe22be73cdd2ad123d8c8b",
+        "mobilesdk_app_id": "1:945595306234:android:1d8871aec2bf77495bf943",
         "android_client_info": {
           "package_name": "com.example.neighbor_nexus"
         }
@@ -15,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA5Ebfm6UB0fMsEbVOKW53Ow3aom73TBfU"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:398602524498:android:b5e360b6d16f90ea3d8c8b",
-        "android_client_info": {
-          "package_name": "deathbyjackalope.com"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA5Ebfm6UB0fMsEbVOKW53Ow3aom73TBfU"
+          "current_key": "AIzaSyBAW17Mv70EvT4r7lInFbapInVwOfwlo8I"
         }
       ],
       "services": {
