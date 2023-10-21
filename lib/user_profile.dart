@@ -7,9 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-
-
-
 class UserProfilePage extends StatefulWidget {
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
@@ -17,12 +14,11 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String? _displayName;
 
   Future<void> _changeProfilePicture(AuthProvider authProvider) async {
     final imagePicker = ImagePicker();
     final XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-    final user = authProvider.user; // Access the user from the AuthProvider
+    final user = authProvider.user;
 
     if (pickedFile != null) {
       final imageFile = File(pickedFile.path);
@@ -36,10 +32,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         final userDoc = _firestore.collection('users').doc(user!.uid);
         await userDoc.update({'icon': iconURL});
 
-        
-
         setState(() {
-          // Update the user iconURL using authProvider.
           authProvider.setUserIconURL(iconURL,context);
         });
       } catch (e) {
@@ -50,7 +43,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Access the user from AuthProvider
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
 
@@ -61,35 +53,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: Center(
         child: Column(
           children: <Widget>[
-            // User Profile Picture
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage: NetworkImage(user?.icon ??
-                    'https://example.com/default-profile-image.jpg'),
+                backgroundImage: NetworkImage(user?.icon ?? 'https://example.com/default-profile-image.jpg'),
               ),
             ),
-
-            // Change Profile Picture Button
             ElevatedButton(
               onPressed: () => _changeProfilePicture(authProvider),
-              child: Text('Change Profile Picture'),
+              child: Text('Change Profile Picture',
+              style: TextStyle(fontSize: 20)),
             ),
-
-            // Display Name
-            Text(
-              'Display Name: ${user?.displayName ?? 'Loading...'}',
-              style: TextStyle(fontSize: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Display Name: ${user?.displayName ?? 'Loading...'}',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
             ),
-
-            // Email
-            Text(
-              'Email: ${user?.email ?? 'Loading...'}',
-              style: TextStyle(fontSize: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Email: ${user?.email ?? 'Loading...'}',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
             ),
-
-            // List of Chats
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('chats')
@@ -99,17 +102,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 if (!snapshot.hasData) {
                   return CircularProgressIndicator();
                 }
-
                 final chatDocs = snapshot.data!.docs;
-
                 return Column(
                   children: chatDocs.map((chat) {
                     return ListTile(
                       title: Text(chat['chatName']),
-                      onTap: () {
-                        // Implement navigation to the chat screen with the selected chat.
-                        // Pass the chat ID or other necessary information to open the correct chat.
-                      },
+                      onTap: () {},
                     );
                   }).toList(),
                 );
