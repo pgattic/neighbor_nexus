@@ -64,47 +64,18 @@ class HomeScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Screen'),
+        title: const Text('Neighborhood Nexus'),
         actions: [
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: Icon(Icons.person),
             onPressed: () {
-              // Implement the sign-out functionality
-              Provider.of<AuthProvider>(context, listen: false).signOut();
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfilePage()));
             },
           ),
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('Welcome to your app!'),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfilePage()));
-                // Implement navigation to other screens here
-              },
-              child: const Text('Go to user'),
-            ),
-            
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatScreen(recipientUid: 'xotUbLqy0wMo6wuoo3HQRMmAqA03',)));
-                // Implement navigation to other screens here
-              },
-              child: const Text('Go to chat'),
-            ),
-                        ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventMap()));
-                // Implement navigation to other screens here
-              },
-              child: const Text('Go to map'),
-            ),
-          ],
-        ),
+        child: EventMap(),
       ),
     );
   }

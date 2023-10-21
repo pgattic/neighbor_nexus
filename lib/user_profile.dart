@@ -92,7 +92,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               onPressed: () { Provider.of<AuthProvider>(context, listen: false).signOut();
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));},
               child: Text(
-                'Signout',
+                'Sign Out',
                 style: TextStyle(fontSize: 20),
               ),
             ),
