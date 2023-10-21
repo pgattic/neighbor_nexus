@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:neighbor_nexus/event_view_screen.dart';
+import 'package:neighbor_nexus/map_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 
@@ -16,7 +17,8 @@ class _EventMapState extends State<EventMap> {
   Set<Marker> markers = {};
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-  final CollectionReference events = FirebaseFirestore.instance.collection('events');
+  final CollectionReference events =
+      FirebaseFirestore.instance.collection('events');
 
   @override
   void initState() {
@@ -57,7 +59,7 @@ class _EventMapState extends State<EventMap> {
   }
 
   void _retrieveEventsFromFirebase() {
-    final user = Provider.of<AuthProvider>(context).user?.uid;
+    final user = Provider.of<AuthProvider>(context, listen: false).user?.uid;
     events.get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
         final eventData = document.data() as Map<String, dynamic>;
@@ -71,163 +73,166 @@ class _EventMapState extends State<EventMap> {
           eventType: eventData['eventType'],
           userId: eventData['userId'],
         );
-        setState(() {
-          markers.add(
-            Marker(
-              markerId: MarkerId(event.eventId),
-              position: LatLng(event.latitude, event.longitude),
-              onTap: () {
-                _showEventPopup(event,context);
-              },
-            ),
-          );
-        });
+        _addEventToMap(LatLng(event.latitude, event.longitude), event);
       });
     });
   }
 
   void _addEventToMap(LatLng latLng, Event event) {
-  // Check if an event with the same LatLng already exists in the markers set
-  if (markers.any((marker) => marker.position == latLng)) {
-    return; // Event with the same LatLng already exists, do not add it again
-  }
-
-  setState(() {
-    markers.add(
-      Marker(
-        markerId: MarkerId(event.eventId),
-        position: latLng,
-        onTap: () {
-          _showEventPopup(event, context);
-        },
-      ),
-    );
+  BitmapDescriptor.fromAssetImage(const ImageConfiguration(), MapIcon.getGraphic(event.eventType))
+      .then((BitmapDescriptor icon) {
+    if (markers.any((marker) => marker.position == latLng)) {
+      return; // Event with the same LatLng already exists, do not add it again
+    }
+    setState(() {
+      markers.add(
+        Marker(
+          markerId: MarkerId(event.eventId),
+          position: latLng,
+          infoWindow: InfoWindow(title: event.title, snippet: event.description),
+          icon: icon,
+          onTap: () {
+            _showEventPopup(event, context);
+          },
+        ),
+      );
+    });
+  }).catchError((e) {
+    setState(() {
+      markers.add(
+        Marker(
+          markerId: MarkerId(event.eventId),
+          position: latLng,
+          infoWindow: InfoWindow(title: event.title, snippet: event.description),
+        ),
+      );
+    });
   });
   events.add(event.toMap());
 }
 
+
   void _addEventDialog(LatLng latLng) {
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay.now();
 
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  const List<String> eventTypes = <String>['One', 'Two', 'Three', 'Four'];
-  var selectedEventType = eventTypes[0];
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+    const List<String> eventTypes = <String>["Party", "Sale", "Help", "Other"];
+    var selectedEventType = eventTypes[0];
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      final user = Provider.of<AuthProvider>(context).user;
-      final userID = user!.uid;
-      return StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text("New Event"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                  ),
-                ),
-                TextFormField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                  ),
-                ),
-                DropdownButton<String>(
-                  value: selectedEventType,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedEventType = newValue!;
-                    });
-                  },
-                  items: eventTypes.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                Text('Selected Date: ${selectedDate.toLocal().toString().split(' ')[0]}'),
-                Text('Selected Time: ${selectedTime.format(context)}'),
-                ElevatedButton(
-                  child: Text('Select Date and Time'),
-                  onPressed: () async {
-                    final DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (pickedDate != null) {
-                      final TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (pickedTime != null) {
-                        setState(() {
-                          selectedDate = DateTime(
-                            pickedDate.year,
-                            pickedDate.month,
-                            pickedDate.day,
-                            pickedTime.hour,
-                            pickedTime.minute,
-                          );
-                          selectedTime = pickedTime;
-                        });
-                      }
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                _addEventToMap(
-                  latLng,
-                  Event(
-                    eventId: DateTime.now().millisecondsSinceEpoch.toString(),
-                    title: titleController.text,
-                    dateTime: selectedDate,
-                    description: descriptionController.text,
-                    latitude: latLng.latitude,
-                    longitude: latLng.longitude,
-                    eventType: selectedEventType,
-                    userId: userID,
-                  ),
-                );
-                Navigator.pop(context);
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-}
-
-  void _showEventPopup(Event event,context) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
       builder: (BuildContext context) {
-        return EventPopup(event: event);
+        final user = Provider.of<AuthProvider>(context).user;
+        final userID = user!.uid;
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text("New Event"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      labelText: 'Title',
+                    ),
+                  ),
+                  TextFormField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                    ),
+                  ),
+                  DropdownButton<String>(
+                    value: selectedEventType,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedEventType = newValue!;
+                      });
+                    },
+                    items: eventTypes
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  Text(
+                      'Selected Date: ${selectedDate.toLocal().toString().split(' ')[0]}'),
+                  Text('Selected Time: ${selectedTime.format(context)}'),
+                  ElevatedButton(
+                    child: Text('Select Date and Time'),
+                    onPressed: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2101),
+                      );
+                      if (pickedDate != null) {
+                        final TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            selectedDate = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                            selectedTime = pickedTime;
+                          });
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  _addEventToMap(
+                    latLng,
+                    Event(
+                      eventId: DateTime.now().millisecondsSinceEpoch.toString(),
+                      title: titleController.text,
+                      dateTime: selectedDate,
+                      description: descriptionController.text,
+                      latitude: latLng.latitude,
+                      longitude: latLng.longitude,
+                      eventType: selectedEventType,
+                      userId: userID,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
+}
 
-
-
+void _showEventPopup(Event event, context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return EventPopup(event: event);
+    },
+  );
+}

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "945595306234",
-    "project_id": "neighborhoodnexus-57ac2",
-    "storage_bucket": "neighborhoodnexus-57ac2.appspot.com"
+    "project_number": "653495789040",
+    "project_id": "neighborhoodnexus-4247a",
+    "storage_bucket": "neighborhoodnexus-4247a.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:945595306234:android:1d8871aec2bf77495bf943",
+        "mobilesdk_app_id": "1:653495789040:android:bf2ad8225fc7a7bcc3a935",
         "android_client_info": {
           "package_name": "com.example.neighbor_nexus"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBAW17Mv70EvT4r7lInFbapInVwOfwlo8I"
+          "current_key": "AIzaSyAM9L49xf0oHyvhRmKFOttHBuqnko95aV0"
         }
       ],
       "services": {

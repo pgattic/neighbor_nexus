@@ -45,6 +45,7 @@ class SignUpPage extends StatelessWidget {
             const SizedBox(height: 8),
             TextFormField(
               controller: passwordController,
+              obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(
@@ -94,8 +95,7 @@ class SignUpPage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 // Navigate to the login page
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.of(context).pop();
               },
               child: const Text("Already have an account? Login"),
             ),

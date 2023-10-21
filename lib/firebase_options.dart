@@ -44,38 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCkVbBH_FMPUUUGCAaJUhfbDvaDcqJyuX0',
-    appId: '1:945595306234:web:8fb01a2542107f6d5bf943',
-    messagingSenderId: '945595306234',
-    projectId: 'neighborhoodnexus-57ac2',
-    authDomain: 'neighborhoodnexus-57ac2.firebaseapp.com',
-    storageBucket: 'neighborhoodnexus-57ac2.appspot.com',
-    measurementId: 'G-KFDYV46MX5',
+    apiKey: 'AIzaSyAptnLl9irzllOjL0ZtOAQSFD-_eWNhCGA',
+    appId: '1:653495789040:web:2bd7d9d13d6968d4c3a935',
+    messagingSenderId: '653495789040',
+    projectId: 'neighborhoodnexus-4247a',
+    authDomain: 'neighborhoodnexus-4247a.firebaseapp.com',
+    storageBucket: 'neighborhoodnexus-4247a.appspot.com',
+    measurementId: 'G-WZC3KLH642',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBAW17Mv70EvT4r7lInFbapInVwOfwlo8I',
-    appId: '1:945595306234:android:1d8871aec2bf77495bf943',
-    messagingSenderId: '945595306234',
-    projectId: 'neighborhoodnexus-57ac2',
-    storageBucket: 'neighborhoodnexus-57ac2.appspot.com',
+    apiKey: 'AIzaSyAM9L49xf0oHyvhRmKFOttHBuqnko95aV0',
+    appId: '1:653495789040:android:bf2ad8225fc7a7bcc3a935',
+    messagingSenderId: '653495789040',
+    projectId: 'neighborhoodnexus-4247a',
+    storageBucket: 'neighborhoodnexus-4247a.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBCHgPUbksazr0PNvDTe9zePSRGKRxd8lc',
-    appId: '1:945595306234:ios:de585ad5f6bcf6795bf943',
-    messagingSenderId: '945595306234',
-    projectId: 'neighborhoodnexus-57ac2',
-    storageBucket: 'neighborhoodnexus-57ac2.appspot.com',
+    apiKey: 'AIzaSyCIVNRhN1TzqA4T16MAzWWLFydAh1QZSWU',
+    appId: '1:653495789040:ios:57a83a9a98a26064c3a935',
+    messagingSenderId: '653495789040',
+    projectId: 'neighborhoodnexus-4247a',
+    storageBucket: 'neighborhoodnexus-4247a.appspot.com',
     iosBundleId: 'com.example.neighborNexus',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBCHgPUbksazr0PNvDTe9zePSRGKRxd8lc',
-    appId: '1:945595306234:ios:d48727152e2acd815bf943',
-    messagingSenderId: '945595306234',
-    projectId: 'neighborhoodnexus-57ac2',
-    storageBucket: 'neighborhoodnexus-57ac2.appspot.com',
+    apiKey: 'AIzaSyCIVNRhN1TzqA4T16MAzWWLFydAh1QZSWU',
+    appId: '1:653495789040:ios:595dbe3528d7c333c3a935',
+    messagingSenderId: '653495789040',
+    projectId: 'neighborhoodnexus-4247a',
+    storageBucket: 'neighborhoodnexus-4247a.appspot.com',
     iosBundleId: 'com.example.neighborNexus.RunnerTests',
   );
 }

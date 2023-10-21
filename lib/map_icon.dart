@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 
 class MapIcon {
-  static IconData getGraphic(String input) {
+  static String getGraphic(String input) {
     switch (input) {
-      case 'One':
-        return Icons.one_k_outlined;
-      case 'Two':
-        return Icons.two_k;
-      case 'Three':
-        return Icons.three_k;
+      case 'Party':
+        return "assets/images/confetti-smol.png";
+      case 'Sale':
+        return "assets/images/sale-tag-smol.png";
+      case 'Help':
+        return "assets/images/help-smol.png";
       default:
-        return Icons.question_mark;
+        return "assets/images/pin-smol.png";
     }
   }
 }
