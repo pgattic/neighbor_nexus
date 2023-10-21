@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:neighbor_nexus/Signup.dart';
+import 'package:neighbor_nexus/Login.dart'; // Import your LoginPage
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/firebase_options.dart';
+import 'package:neighbor_nexus/signup.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-// Import your AuthProvider class
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +19,7 @@ void main() async {
     ),
   );
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -35,9 +36,9 @@ class MyApp extends StatelessWidget {
 
           // Check if the user is authenticated
           if (user != null) {
-            return const HomeScreen();
+            return HomeScreen(); // Return HomeScreen when the user is authenticated
           } else {
-            return SignUpPage();
+            return LoginPage(); // Return LoginPage when the user is not authenticated
           }
         },
       ),
@@ -53,6 +54,15 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Screen'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () {
+              // Implement the sign-out functionality
+              Provider.of<AuthProvider>(context, listen: false).signOut();
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -61,6 +71,7 @@ class HomeScreen extends StatelessWidget {
             const Text('Welcome to your app!'),
             ElevatedButton(
               onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpPage()));
                 // Implement navigation to other screens here
               },
               child: const Text('Go to Other Screen'),
