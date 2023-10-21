@@ -73,6 +73,15 @@ Future<void> login({required String email, required String password}) async {
     print('Login error: $e');
   }
 }
+
+ Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      // Password reset email sent successfully
+    } catch (e) {
+      throw e; // Handle or rethrow the error as needed
+    }
+  }
 }
 
 
@@ -86,4 +95,40 @@ class User {
   List<String> eventIds;
 
   User({required this.uid, required this.email, required this.displayName, required this.icon, required this.eventIds});
+}
+
+class Message {
+  String? senderId;
+  String? recipientId;
+  String text;
+  DateTime timestamp;
+
+  Message({
+    required this.senderId,
+    required this.recipientId,
+    required this.text,
+    required this.timestamp,
+  });
+}
+
+class MessageService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> sendMessage(Message message, String chatId) async {
+    await _firestore.collection('messages').add({
+      'senderId': message.senderId,
+      'recipientId': message.recipientId,
+      'text': message.text,
+      'timestamp': message.timestamp,
+      'chatId': chatId,
+    });
+  }
+
+  Stream<QuerySnapshot> getChatMessages(String chatId) {
+    return _firestore
+        .collection('messages')
+        .where('chatId', isEqualTo: chatId)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/Login.dart'; // Import your LoginPage
+import 'package:neighbor_nexus/chat_screen.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/firebase_options.dart';
 import 'package:neighbor_nexus/user_profile.dart';
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +73,14 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserPage()));
+                // Implement navigation to other screens here
+              },
+              child: const Text('Go to Other Screen'),
+            ),
+            
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatScreen(recipientUid: 'UCGHq5yPNdRvjUkZWeS9RgGbnsy1',)));
                 // Implement navigation to other screens here
               },
               child: const Text('Go to Other Screen'),
