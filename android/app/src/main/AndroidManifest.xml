@@ -2,7 +2,7 @@
     <application
         android:label="neighbor_nexus"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/assets/images/logo.jpg">
         <activity
             android:name=".MainActivity"
             android:exported="true"

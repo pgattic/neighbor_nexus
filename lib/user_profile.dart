@@ -85,7 +85,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               padding: const EdgeInsets.all(16.0),
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage:AssetImage("assets/images/logo.png"),
+                backgroundImage:AssetImage("assets/images/logo.jpg"),
               ),
             ),
             ElevatedButton(
