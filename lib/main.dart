@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:neighbor_nexus/Login.dart'; // Import your LoginPage
+import 'package:neighbor_nexus/login.dart'; // Import your LoginPage
 import 'package:neighbor_nexus/chat_screen.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/firebase_options.dart';
