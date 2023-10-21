@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:neighbor_nexus/login.dart'; // Import your LoginPage
 import 'package:neighbor_nexus/chat_screen.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
@@ -37,6 +38,10 @@ class MyApp extends StatelessWidget {
       home: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           final user = authProvider.user;
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]);
 
           // Check if the user is authenticated
           if (user != null) {
