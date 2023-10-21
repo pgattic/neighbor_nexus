@@ -1,115 +1,121 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:neighbor_nexus/firebase/auth_provider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-class UserPage extends StatefulWidget {
+
+
+
+class UserProfilePage extends StatefulWidget {
   @override
-  _UserPageState createState() => _UserPageState();
+  _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-class _UserPageState extends State<UserPage> {
-  final _picker = ImagePicker();
-  String _profileImageURL = ''; // This variable stores the profile image URL.
+class _UserProfilePageState extends State<UserProfilePage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String? _displayName;
 
-  // Function to update the user's profile picture.
-  Future<void> _updateProfilePicture() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> _changeProfilePicture(AuthProvider authProvider) async {
+    final imagePicker = ImagePicker();
+    final XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    final user = authProvider.user; // Access the user from the AuthProvider
+
     if (pickedFile != null) {
-      final user = Provider.of<AuthProvider>(context).user;
-      final userID = user?.uid;
+      final imageFile = File(pickedFile.path);
+      final storage = FirebaseStorage.instance;
+      final Reference storageReference = storage.ref().child('profile_images/${user!.uid}.jpg');
+      await storageReference.putFile(imageFile);
+      final iconURL = await storageReference.getDownloadURL();
 
-      if (userID != null) {
-        final storageRef =
-            FirebaseStorage.instance.ref().child('profileImages/$userID.jpg');
-        final uploadTask = storageRef.putFile(File(pickedFile.path));
+      try {
+        await user?.iconURL(newIconURL: iconURL);
+        final userDoc = _firestore.collection('users').doc(user!.uid);
+        await userDoc.update({'icon': iconURL});
 
-        // Listen for the completion of the upload task.
-        uploadTask.then((snapshot) async {
-          final imageURL = await snapshot.ref.getDownloadURL();
+        
 
-          // Update the user's profileImageURL in Firestore.
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userID)
-              .update({
-            'profileImageURL': imageURL,
-          });
-
-          setState(() {
-            _profileImageURL = imageURL;
-          });
-        }).catchError((error) {
-          print('Error uploading image: $error');
+        setState(() {
+          // Update the user iconURL using authProvider.
+          authProvider.setUserIconURL(iconURL,context);
         });
+      } catch (e) {
+        print('Error updating user profile: $e');
       }
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    // Load the user's profile image URL from Firestore when the page loads.
-    final user = Provider.of<AuthProvider>(context, listen: false).user;
-    final userID = user?.uid;
+  Widget build(BuildContext context) {
+    // Access the user from AuthProvider
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.user;
 
-    if (userID != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(userID)
-          .get()
-          .then((userDoc) {
-        final data = userDoc.data() as Map<String, dynamic>;
-        final profileImageURL = data['profileImageURL'];
-        setState(() {
-          _profileImageURL = profileImageURL ??
-              ''; // If there's no profile image URL, set it to an empty string.
-        });
-      });
-    }
-  }
-
-  @override
-  Widget build(context) {
-    final user = Provider.of<AuthProvider>(context).user;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User page'),
-        centerTitle: true,
+        title: Text('User Profile'),
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ElevatedButton(
-                          onPressed: _updateProfilePicture,
-                          child: const Text('Update Profile Picture'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+        child: Column(
+          children: <Widget>[
+            // User Profile Picture
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CircleAvatar(
+                radius: 60,
+                backgroundImage: NetworkImage(user?.icon ??
+                    'https://example.com/default-profile-image.jpg'),
               ),
-              const SizedBox(height: 20),
-              Text('Name: ${user?.displayName ?? 'Unknown'}'),
-              const SizedBox(height: 20),
-              Text('Email: ${user?.email ?? 'Unknown'}'),
-            ],
-          ),
+            ),
+
+            // Change Profile Picture Button
+            ElevatedButton(
+              onPressed: () => _changeProfilePicture(authProvider),
+              child: Text('Change Profile Picture'),
+            ),
+
+            // Display Name
+            Text(
+              'Display Name: ${user?.displayName ?? 'Loading...'}',
+              style: TextStyle(fontSize: 16),
+            ),
+
+            // Email
+            Text(
+              'Email: ${user?.email ?? 'Loading...'}',
+              style: TextStyle(fontSize: 16),
+            ),
+
+            // List of Chats
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('chats')
+                  .where('participants', arrayContains: user?.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return CircularProgressIndicator();
+                }
+
+                final chatDocs = snapshot.data!.docs;
+
+                return Column(
+                  children: chatDocs.map((chat) {
+                    return ListTile(
+                      title: Text(chat['chatName']),
+                      onTap: () {
+                        // Implement navigation to the chat screen with the selected chat.
+                        // Pass the chat ID or other necessary information to open the correct chat.
+                      },
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

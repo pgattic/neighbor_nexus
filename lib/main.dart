@@ -52,6 +52,8 @@ class HomeScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<AuthProvider>(context).user;
+    final userID = user!.uid;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Screen'),
@@ -72,7 +74,7 @@ class HomeScreen extends StatelessWidget {
             const Text('Welcome to your app!'),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfilePage()));
                 // Implement navigation to other screens here
               },
               child: const Text('Go to Other Screen'),
@@ -80,7 +82,7 @@ class HomeScreen extends StatelessWidget {
             
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatScreen(recipientUid: 'UCGHq5yPNdRvjUkZWeS9RgGbnsy1',)));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatScreen(recipientUid: 'xotUbLqy0wMo6wuoo3HQRMmAqA03',)));
                 // Implement navigation to other screens here
               },
               child: const Text('Go to Other Screen'),

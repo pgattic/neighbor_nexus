@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 class AuthProvider extends ChangeNotifier {
@@ -82,6 +83,12 @@ Future<void> login({required String email, required String password}) async {
       throw e; // Handle or rethrow the error as needed
     }
   }
+
+  void setUserIconURL(String iconURL,context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.user;
+    user?.icon = iconURL;
+  }
 }
 
 
@@ -94,8 +101,20 @@ class User {
   String icon;
   List<String> eventIds;
 
-  User({required this.uid, required this.email, required this.displayName, required this.icon, required this.eventIds});
+  User({
+    required this.uid,
+    required this.email,
+    required this.displayName,
+    required this.icon,
+    required this.eventIds,
+  });
+
+
+  iconURL({required String newIconURL}) {
+    icon = newIconURL;
+  }
 }
+
 
 class Message {
   String? senderId;
