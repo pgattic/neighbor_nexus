@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:neighbor_nexus/event_view_screen.dart';
 import 'package:provider/provider.dart';
 
 
@@ -211,3 +212,36 @@ class Event {
   }
 }
 
+class EventPopup extends StatelessWidget {
+  final Event event;
+
+  EventPopup({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: Text(event.title),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('Date and Time: ${event.dateTime.toString()}'),
+              Text('Description: ${event.description}'),
+            ],
+          ),
+        ),
+        ElevatedButton(
+  onPressed: () {
+    // Define the behavior when the "Go to Event" button is pressed.
+    // Navigate to the event view screen and pass the event object.
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => EventDetailPage( event: event),
+    ));
+  },
+  child: Text('Go to Event'),
+)
+      ],
+    );
+  }
+}
