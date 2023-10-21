@@ -69,11 +69,25 @@ Future<void> login({required String email, required String password}) async {
       print('Login successful');
     }
   } catch (e) {
-    // Handle login errors
-    // You can show an error message to the user if needed
-    print('Login error: $e');
+    // Handle login errors based on Firebase Auth error codes
+    if (e is FirebaseAuthException) {
+      if (e.code == 'user-not-found') {
+        print('No user found with this email');
+        // You can show a corresponding error message
+      } else if (e.code == 'wrong-password') {
+        print('Incorrect password');
+        // You can show a corresponding error message
+      } else {
+        print('Login error: ${e.code}');
+        // Handle other error scenarios
+      }
+    } else {
+      print('Login error: $e');
+      // Handle other types of exceptions
+    }
   }
 }
+
 
  Future<void> resetPassword(String email) async {
     try {
