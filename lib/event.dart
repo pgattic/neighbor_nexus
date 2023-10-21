@@ -1,90 +1,105 @@
-import 'dart:async';
-import 'dart:collection';
-import 'dart:js_util';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:map_veiw/map_view.dart';
+// import 'dart:async';
+// import 'dart:collection';
+// import 'dart:js_util';
+// import 'package:flutter/material.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class Event {
-  String name;
-  Location location;
-  DateTime time;
-  String explanation;
 
-  Event (this.name, this.location, this.time, this.explanation);
-}
+// class Event {
+//   String name;
+//   String location;
+//   DateTime time;
+//   String explanation;
 
-class EventManager {
-  List<Event> events = [];
+//   Event (this.name, this.location, this.time, this.explanation);
+// }
 
-  StreamController<Event>
-  eventController = new
-  StreamController.broadcast();
+// class EventManager {
+//   List<Event> events = [];
 
-  void addEvent (Event event)
-  {
-    events.add (event);
+//   StreamController<Event>
+//   eventController = new
+//   StreamController.broadcast();
 
-    eventController.add(event);
-  }
+//   void addEvent (Event event)
+//   {
+//     events.add (event);
 
-  Stream<Event> get
-  eventStream =>
-  eventController.stream;
-}
+//     eventController.add(event);
+//   }
 
-class MapViewWidget extends
-StatefulWidget{
-  @override
-  _MapViewWidgetStatecreateState() =>_MapViewWidgetState();
-}
+//   Stream<Event> get
+//   eventStream =>
+//   eventController.stream;
+// }
 
-class _MapViewWidgetState extends State<MapViewWidget>
-{
-  MapView mapView = new MapView();
+// class MapViewWidget extends
+// StatefulWidget{
+//   const MapViewWidget({super.key});
 
-  EventManager eventManager = new EventManager();
+//   @override
+//   _MapViewWidgetStatecreateState() =>_MapViewWidgetState();
+  
+//   @override
+//   State<StatefulWidget> createState() {
+//     // TODO: implement createState
+//     throw UnimplementedError();
+//   }
+// }
 
-  @override void initState() {
-    super.initState();
+// class _MapViewWidgetState extends State<MapViewWidget>
+// {
+//   MapView mapView = new MapView();
 
-    mapView.show(new MapOptions(
-      showUserLocation:true,
+//   EventManager eventManager = new EventManager();
 
-      initialCameraPosition: new CameraPosition(new Location (43.491651, -112.033964),//Rexburg, Idaho
-      15.0,),
-      title: "Map View",
-    ),
-    );
+//   @override void initState() {
+//     super.initState();
 
-    eventManager.eventStream.listen((event) {
-      mapView.addMarker(
-        new Marker (
-          event.name,
-          event.explanation,
-          event.location.latitude,
-          event.location.longitude,
-          color:Colors.red,
-        ),
-      );
-    });
-  }
-  @override
-  Widget build (BuildContext context) {
-    return Scaffold(
-      appBar: AppBar (title: Text ("Map View Widget"),),
-      body: Center(child: Text ("This is a placeholder for the map view"),),
-      floatingActionButton: FloatingActionButton (
-        onpressed: () {
-          //a sample event
-          Event sampleEvent = new Event(
-            "Sample Event", new Location(43.491651, -112.033964), DateTime.now(), "This is a sample event",
-          );
-          eventManager.addEvent(sampleEvent);
+//     mapView.show(MapOptions(
+//       showUserLocation:true,
+
+//       initialCameraPosition: CameraPosition(new Location (43.491651, -112.033964),//Rexburg, Idaho
+//       15.0, target: null,),
+//       title: "Map View",
+//     ),
+//     );
+
+//     eventManager.eventStream.listen((event) {
+//       mapView.addMarker(
+//         new Marker (
+//           event.name,
+//           event.explanation,
+//           event.location.latitude,
+//           event.location.longitude,
+//           icon:Colors.red,
+//         ),
+//       );
+//     });
+//   }
+//   @override
+//   Widget build (BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar (title: Text ("Map View Widget"),),
+//       body: Center(child: Text ("This is a placeholder for the map view"),),
+//       floatingActionButton: FloatingActionButton (
+//         onPressed: () {
+//           //a sample event
+//           Event sampleEvent = Event(
+//             "Sample Event", new Location(43.491651, -112.033964) as String, DateTime.now(), "This is a sample event",
+//           );
+//           eventManager.addEvent(sampleEvent);
       
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-}
+//         },
+//         child: Icon(Icons.add),
+//       ),
+//     );
+//   }
+// }
+
+// class Location {
+//   Location(double d, double e);
+// }
+
+// class MapOptions {
+// }
