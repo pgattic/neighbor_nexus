@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:neighbor_nexus/event_view_screen.dart';
 import 'package:neighbor_nexus/map_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 
+bool isEventMoreThan12HoursAgo(DateTime eventDateTime) {
+  DateTime now = DateTime.now();
+  Duration difference = now.difference(eventDateTime);
+  return difference.inHours > 12;
+}
+
 class EventMap extends StatefulWidget {
+  const EventMap({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _EventMapState createState() => _EventMapState();
 }
 
@@ -46,22 +54,21 @@ class _EventMapState extends State<EventMap> {
               markers: markers,
               onLongPress: _addEventDialog,
               initialCameraPosition: const CameraPosition(
-                target: LatLng(37.42796133580664, -122.085749655962),
+                target: LatLng(43.814189, -111.785021),
                 zoom: 14.4746,
               ),
             ),
           );
         }
 
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       },
     );
   }
 
   void _retrieveEventsFromFirebase() {
-    final user = Provider.of<AuthProvider>(context, listen: false).user?.uid;
     events.get().then((querySnapshot) {
-      querySnapshot.docs.forEach((document) {
+      for (var document in querySnapshot.docs) {
         final eventData = document.data() as Map<String, dynamic>;
         final event = Event(
           eventId: eventData['eventId'],
@@ -73,33 +80,38 @@ class _EventMapState extends State<EventMap> {
           eventType: eventData['eventType'],
           userId: eventData['userId'],
         );
+
         _addEventToMap(LatLng(event.latitude, event.longitude), event);
-      });
+      }
     });
   }
 
   void _addEventToMap(LatLng latLng, Event event) {
-  BitmapDescriptor.fromAssetImage(const ImageConfiguration(), MapIcon.getGraphic(event.eventType))
-      .then((BitmapDescriptor icon) {
-    if (markers.any((marker) => marker.position == latLng)) {
-      return; // Event with the same LatLng already exists, do not add it again
+    if (!isEventMoreThan12HoursAgo(event.dateTime)) {
+      BitmapDescriptor.fromAssetImage(
+              const ImageConfiguration(), MapIcon.getGraphic(event.eventType))
+          .then((BitmapDescriptor icon) {
+        if (markers.any((marker) => marker.position == latLng)) {
+          return; // Event with the same LatLng already exists, do not add it again
+        }
+        setState(() {
+          markers.add(
+            Marker(
+              markerId: MarkerId(event.eventId),
+              position: latLng,
+              infoWindow:
+                  InfoWindow(title: event.title, snippet: event.description),
+              icon: icon,
+              onTap: () {
+                _showEventPopup(event, context);
+              },
+            ),
+          );
+        });
+      });
     }
-    setState(() {
-      markers.add(
-        Marker(
-          markerId: MarkerId(event.eventId),
-          position: latLng,
-          infoWindow: InfoWindow(title: event.title, snippet: event.description),
-          icon: icon,
-          onTap: () {
-            _showEventPopup(event, context);
-          },
-        ),
-      );
-    });
-  });
-}
-
+    ;
+  }
 
   void _addEventDialog(LatLng latLng) {
     DateTime selectedDate = DateTime.now();
@@ -107,7 +119,13 @@ class _EventMapState extends State<EventMap> {
 
     final TextEditingController titleController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
-    const List<String> eventTypes = <String>["Party", "Sale", "Help", "Other"];
+    const List<String> eventTypes = <String>[
+      "Party",
+      "Sale",
+      "Help",
+      "Ride-Share",
+      "Other"
+    ];
     var selectedEventType = eventTypes[0];
 
     showDialog(
@@ -154,7 +172,7 @@ class _EventMapState extends State<EventMap> {
                       'Selected Date: ${selectedDate.toLocal().toString().split(' ')[0]}'),
                   Text('Selected Time: ${selectedTime.format(context)}'),
                   ElevatedButton(
-                    child: Text('Select Date and Time'),
+                    child: const Text('Select Date and Time'),
                     onPressed: () async {
                       final DateTime? pickedDate = await showDatePicker(
                         context: context,
@@ -163,6 +181,7 @@ class _EventMapState extends State<EventMap> {
                         lastDate: DateTime(2101),
                       );
                       if (pickedDate != null) {
+                        // ignore: use_build_context_synchronously
                         final TimeOfDay? pickedTime = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
