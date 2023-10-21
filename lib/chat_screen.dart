@@ -113,17 +113,29 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final user = _auth.currentUser;
-    if (user == null) {
-      return Scaffold(
-        body: Center(
-          child: Text('You must be logged in to use this feature.'),
-        ),
-      );
-    }
+Widget build(BuildContext context) {
+  final user = _auth.currentUser;
+  if (user == null) {
+    return Scaffold(
+      body: Center(
+        child: Text('You must be logged in to use this feature.'),
+      ),
+    );
+  }
 
-    final currentUserUid = user.uid;
+  final currentUserUid = user.uid;
+
+  // Check if the current user's UID is the same as the recipient's UID
+  if (currentUserUid == widget.recipientUid) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat Error'),
+      ),
+      body: Center(
+        child: Text('You cannot chat with yourself.'),
+      ),
+    );
+  }
 
     return Scaffold(
       appBar: AppBar(

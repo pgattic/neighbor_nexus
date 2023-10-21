@@ -6,10 +6,6 @@ import 'package:neighbor_nexus/event_view_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 
-// Placeholder for AuthProvider
-
-
-
 class EventMap extends StatefulWidget {
   @override
   _EventMapState createState() => _EventMapState();
@@ -21,11 +17,6 @@ class _EventMapState extends State<EventMap> {
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   final CollectionReference events = FirebaseFirestore.instance.collection('events');
-
-  late String selectedMonth;
-  late String selectedDay;
-  late String selectedYear;
-  late String selectedTime;
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +69,9 @@ class _EventMapState extends State<EventMap> {
             Marker(
               markerId: MarkerId(event.eventId),
               position: LatLng(event.latitude, event.longitude),
-              infoWindow: InfoWindow(title: event.title, snippet: event.description),
-              onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventInfoWindow(event.eventId, event.userId, user!)));} // Open the Event View screen with this information
+              onTap: () {
+                _showEventPopup(event,context);
+              },
             ),
           );
         });
@@ -88,19 +80,26 @@ class _EventMapState extends State<EventMap> {
   }
 
   void _addEventToMap(LatLng latLng, Event event) {
-    setState(() {
-      markers.add(
-        Marker(
-          markerId: MarkerId(event.eventId),
-          position: latLng,
-          infoWindow: InfoWindow(title: event.title, snippet: event.description),
-        ),
-      );
-    });
-    events.add(event.toMap());
+  // Check if an event with the same LatLng already exists in the markers set
+  if (markers.any((marker) => marker.position == latLng)) {
+    return; // Event with the same LatLng already exists, do not add it again
   }
 
-void _addEventDialog(LatLng latLng) {
+  setState(() {
+    markers.add(
+      Marker(
+        markerId: MarkerId(event.eventId),
+        position: latLng,
+        onTap: () {
+          _showEventPopup(event, context);
+        },
+      ),
+    );
+  });
+  events.add(event.toMap());
+}
+
+  void _addEventDialog(LatLng latLng) {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
@@ -213,3 +212,15 @@ void _addEventDialog(LatLng latLng) {
   );
 }
 }
+
+  void _showEventPopup(Event event,context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return EventPopup(event: event);
+      },
+    );
+  }
+
+
+
