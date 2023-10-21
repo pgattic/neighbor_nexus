@@ -97,18 +97,7 @@ class _EventMapState extends State<EventMap> {
         ),
       );
     });
-  }).catchError((e) {
-    setState(() {
-      markers.add(
-        Marker(
-          markerId: MarkerId(event.eventId),
-          position: latLng,
-          infoWindow: InfoWindow(title: event.title, snippet: event.description),
-        ),
-      );
-    });
   });
-  events.add(event.toMap());
 }
 
 
@@ -203,19 +192,21 @@ class _EventMapState extends State<EventMap> {
               ),
               TextButton(
                 onPressed: () {
+                  var event = Event(
+                    eventId: DateTime.now().millisecondsSinceEpoch.toString(),
+                    title: titleController.text,
+                    dateTime: selectedDate,
+                    description: descriptionController.text,
+                    latitude: latLng.latitude,
+                    longitude: latLng.longitude,
+                    eventType: selectedEventType,
+                    userId: userID,
+                  );
                   _addEventToMap(
                     latLng,
-                    Event(
-                      eventId: DateTime.now().millisecondsSinceEpoch.toString(),
-                      title: titleController.text,
-                      dateTime: selectedDate,
-                      description: descriptionController.text,
-                      latitude: latLng.latitude,
-                      longitude: latLng.longitude,
-                      eventType: selectedEventType,
-                      userId: userID,
-                    ),
+                    event,
                   );
+                  events.add(event.toMap());
                   Navigator.pop(context);
                 },
                 child: const Text('OK'),
