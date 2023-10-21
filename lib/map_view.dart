@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:neighbor_nexus/event_view_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 
@@ -58,6 +59,7 @@ class _EventMapState extends State<EventMap> {
   }
 
   void _retrieveEventsFromFirebase() {
+    final user = Provider.of<AuthProvider>(context).user?.uid;
     events.get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
         final eventData = document.data() as Map<String, dynamic>;
@@ -77,6 +79,7 @@ class _EventMapState extends State<EventMap> {
               markerId: MarkerId(event.eventId),
               position: LatLng(event.latitude, event.longitude),
               infoWindow: InfoWindow(title: event.title, snippet: event.description),
+              onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventInfoWindow(event.eventId, event.userId, user!)));} // Open the Event View screen with this information
             ),
           );
         });
