@@ -19,7 +19,7 @@ class MapSampleState extends State<MapSample> {
 
   late FirebaseFirestore firestore;
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
+  static final CameraPosition _start = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
@@ -40,34 +40,94 @@ class MapSampleState extends State<MapSample> {
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
+        initialCameraPosition: _start,
         onMapCreated: (GoogleMapController controller) {
           mapController = controller;
         },
         markers: _markers,
-        onLongPress: _addMarker,
+        onLongPress: _addMarkerDialog,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: const Text('To the lake!'),
-        icon: const Icon(Icons.directions_boat),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: ()=>{},
+      //   label: const Text('To the lake!'),
+      //   icon: const Icon(Icons.directions_boat),
+      // ),
+    );
+  }
+
+
+  _addMarkerDialog(LatLng latLng) async {
+    final TextEditingController title = TextEditingController();
+    final TextEditingController description = TextEditingController();
+    const List<String> list = <String>['One', 'Two', 'Three', 'Four'];
+    var dropdownValue = list[0];
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text("New Event"),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: title,
+              decoration: InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+            TextFormField(
+              controller: description,
+              decoration: InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+            DropdownMenu<String>(
+              initialSelection: list.first,
+              onSelected: (String? value) {
+                // This is called when the user selects an item.
+                setState(() {
+                  dropdownValue = value!;
+                });
+              },
+              dropdownMenuEntries:
+                  list.map<DropdownMenuEntry<String>>((String value) {
+                return DropdownMenuEntry<String>(value: value, label: value);
+              }).toList(),
+            )
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => {
+              _addMarker(latLng, title.text, description.text, dropdownValue),
+              Navigator.pop(context, 'OK')
+            },
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = mapController;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-  }
-
-  void _addMarker(LatLng latLng) async {
+  void _addMarker(LatLng latLng, String title, String description, String dropdownValue) async {
     String id = DateTime.now().millisecondsSinceEpoch.toString();
     Marker marker = Marker(
       markerId: MarkerId(id),
       position: latLng,
       infoWindow: InfoWindow(
-        title: "The Title",
-        snippet: "iajhfoaefjeaf etoerjioj poggers",
+        title: title,
+        snippet: description,
       ),
     );
     _markers.add(marker);
@@ -77,14 +137,12 @@ class MapSampleState extends State<MapSample> {
     await firestore.collection('markers').doc(id).set({
       'latitude': latLng.latitude,
       'longitude': latLng.longitude,
+      'title': title,
+      'description': description,
+      'dropdownvalue': dropdownValue,
     });
 
     setState(() {});
   }
 
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
 }
