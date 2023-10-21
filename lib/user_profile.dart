@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:neighbor_nexus/chat_screen.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -14,31 +14,58 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<Widget> chatButtons = [];
+  Set<String> uniqueUserIds = Set(); // Store unique user IDs
 
   Future<void> _changeProfilePicture(AuthProvider authProvider) async {
-    final imagePicker = ImagePicker();
-    final XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    // ... your existing code for changing the profile picture
+  }
+
+  Future<void> _fetchChatButtons(AuthProvider authProvider) async {
     final user = authProvider.user;
 
-    if (pickedFile != null) {
-      final imageFile = File(pickedFile.path);
-      final storage = FirebaseStorage.instance;
-      final Reference storageReference = storage.ref().child('profile_images/${user!.uid}.jpg');
-      await storageReference.putFile(imageFile);
-      final iconURL = await storageReference.getDownloadURL();
+    // Clear the existing chatButtons and uniqueUserIds when fetching
+    chatButtons.clear();
+    uniqueUserIds.clear();
 
-      try {
-        await user?.iconURL(newIconURL: iconURL);
-        final userDoc = _firestore.collection('users').doc(user!.uid);
-        await userDoc.update({'icon': iconURL});
+    final chatDocs = await FirebaseFirestore.instance
+        .collection('messages')
+        .where('recipientId', isEqualTo: user?.uid)
+        .get();
 
-        setState(() {
-          authProvider.setUserIconURL(iconURL,context);
-        });
-      } catch (e) {
-        print('Error updating user profile: $e');
+    for (final chat in chatDocs.docs) {
+      final otherUserId = chat['senderId'];
+
+      // Only add unique users
+      if (!uniqueUserIds.contains(otherUserId)) {
+        uniqueUserIds.add(otherUserId);
+
+        final otherUserDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(otherUserId)
+            .get();
+        final otherUserDisplayName = otherUserDoc['displayName'];
+
+        chatButtons.add(
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ChatScreen(recipientUid: otherUserId),
+              ));
+            },
+            child: Text("Your Chat with " + otherUserDisplayName),
+          ),
+        );
       }
     }
+    setState(() {}); // Trigger a rebuild to display the chat buttons.
+  }
+
+  @override
+  void initState() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _fetchChatButtons(authProvider);
+    super.initState();
   }
 
   @override
@@ -57,13 +84,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
               padding: const EdgeInsets.all(16.0),
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage: NetworkImage(user?.icon ?? 'https://example.com/default-profile-image.jpg'),
+                backgroundImage: NetworkImage(user?.icon ??
+                    'https://example.com/default-profile-image.jpg'),
               ),
             ),
             ElevatedButton(
               onPressed: () => _changeProfilePicture(authProvider),
-              child: Text('Change Profile Picture',
-              style: TextStyle(fontSize: 20)),
+              child: Text(
+                'Change Profile Picture',
+                style: TextStyle(fontSize: 20),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -93,25 +123,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ),
             ),
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('chats')
-                  .where('participants', arrayContains: user?.uid)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }
-                final chatDocs = snapshot.data!.docs;
-                return Column(
-                  children: chatDocs.map((chat) {
-                    return ListTile(
-                      title: Text(chat['chatName']),
-                      onTap: () {},
-                    );
-                  }).toList(),
-                );
-              },
+            Expanded(
+              child: ListView(
+                children: chatButtons
+                    .map((chatButton) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: chatButton,
+                        ))
+                    .toList(),
+              ),
             ),
           ],
         ),

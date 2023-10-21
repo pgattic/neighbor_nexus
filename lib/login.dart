@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
 import 'package:neighbor_nexus/main.dart';
-import 'package:neighbor_nexus/map_view.dart';
 import 'package:neighbor_nexus/signup.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -86,7 +86,15 @@ class _LoginPageState extends State<LoginPage> {
                     authProvider.login(
                       email: _emailController.text,
                       password: _passwordController.text,
-                    );
+                    ).catchError((error) {
+                      Fluttertoast.showToast(
+                        msg: 'Login failed: $error',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                      );
+                    });
                   }
                 },
                 child: const Text('Login'),

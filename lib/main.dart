@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
-    final userID = user!.uid;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Screen'),
@@ -66,6 +66,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               // Implement the sign-out functionality
               Provider.of<AuthProvider>(context, listen: false).signOut();
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
             },
           ),
         ],

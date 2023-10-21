@@ -89,6 +89,11 @@ Future<void> login({required String email, required String password}) async {
     final user = authProvider.user;
     user?.icon = iconURL;
   }
+
+    Future<bool> isLoggedIn() async {
+    final user = FirebaseAuth.instance.currentUser;
+    return user != null;
+  }
 }
 
 

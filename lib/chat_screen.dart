@@ -62,6 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? chatId;
   List<Message> _chatMessages = [];
   late Timer _chatRefreshTimer;
+  String recipientDisplayName = '';
 
   @override
   void initState() {
@@ -72,12 +73,24 @@ class _ChatScreenState extends State<ChatScreen> {
       chatId = currentUserUid.hashCode <= widget.recipientUid.hashCode
           ? '$currentUserUid-${widget.recipientUid}'
           : '${widget.recipientUid}-$currentUserUid';
+      _fetchRecipientDisplayName();
       _initializeChatMessages();
-      // Start a timer to refresh chat messages every 5 seconds.
       _chatRefreshTimer = Timer.periodic(Duration(seconds: 5), (timer) {
         _initializeChatMessages();
       });
     }
+  }
+
+  Future<void> _fetchRecipientDisplayName() async {
+    final recipientUid = widget.recipientUid;
+    final recipientUser = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(recipientUid)
+        .get();
+    final displayName = recipientUser['displayName'];
+    setState(() {
+      recipientDisplayName = displayName;
+    });
   }
 
   Future<void> _initializeChatMessages() async {
@@ -95,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    _chatRefreshTimer.cancel(); // Cancel the timer when disposing the screen.
+    _chatRefreshTimer.cancel();
     super.dispose();
   }
 
@@ -114,7 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with User'),
+        title: Text('Chat with $recipientDisplayName'),
       ),
       body: Column(
         children: [
@@ -185,5 +198,4 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
 
