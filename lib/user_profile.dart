@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:neighbor_nexus/chat_screen.dart';
 import 'package:neighbor_nexus/firebase/auth_provider.dart';
+import 'package:neighbor_nexus/login.dart';
 import 'package:provider/provider.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -84,14 +85,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
               padding: const EdgeInsets.all(16.0),
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage: NetworkImage(user?.icon ??
-                    'https://example.com/default-profile-image.jpg'),
+                backgroundImage:AssetImage("assets/images/logo.png"),
               ),
             ),
             ElevatedButton(
-              onPressed: () => _changeProfilePicture(authProvider),
+              onPressed: () { Provider.of<AuthProvider>(context, listen: false).signOut();
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));},
               child: Text(
-                'Change Profile Picture',
+                'Signout',
                 style: TextStyle(fontSize: 20),
               ),
             ),
