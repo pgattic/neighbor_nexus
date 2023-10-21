@@ -43,7 +43,7 @@ dependencies:
   firebase_storage: ^11.3.1
   image_picker: ^1.0.4
   custom_info_window: ^1.0.1
-
+  map_view: ^0.0.14
 
 dev_dependencies:
   flutter_test:
@@ -100,3 +100,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+

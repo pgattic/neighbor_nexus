@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'dart:js_util';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:map_veiw/map_view.dart';
+import 'package:map_view/map_view.dart';
 
 class Event {
   String name;
@@ -18,8 +18,7 @@ class EventManager {
   List<Event> events = [];
 
   StreamController<Event>
-  eventController = new
-  StreamController.broadcast();
+  eventController = StreamController.broadcast();
 
   void addEvent (Event event)
   {
@@ -31,12 +30,16 @@ class EventManager {
   Stream<Event> get
   eventStream =>
   eventController.stream;
+
+  void dispose() {
+    eventController.close();
+  }
 }
 
 class MapViewWidget extends
 StatefulWidget{
   @override
-  _MapViewWidgetStatecreateState() =>_MapViewWidgetState();
+  _MapViewWidgetState createState() =>_MapViewWidgetState();
 }
 
 class _MapViewWidgetState extends State<MapViewWidget>
@@ -45,7 +48,13 @@ class _MapViewWidgetState extends State<MapViewWidget>
 
   EventManager eventManager = new EventManager();
 
-  @override void initState() {
+  @override
+  void dispose() {
+  eventManager.dispose();
+  super.dispose();
+  }
+  @override
+  void initState() {
     super.initState();
 
     mapView.show(new MapOptions(
@@ -75,7 +84,7 @@ class _MapViewWidgetState extends State<MapViewWidget>
       appBar: AppBar (title: Text ("Map View Widget"),),
       body: Center(child: Text ("This is a placeholder for the map view"),),
       floatingActionButton: FloatingActionButton (
-        onpressed: () {
+        onPressed: () {
           //a sample event
           Event sampleEvent = new Event(
             "Sample Event", new Location(43.491651, -112.033964), DateTime.now(), "This is a sample event",
