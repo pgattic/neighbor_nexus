@@ -212,6 +212,8 @@ class Event {
   }
 }
 
+
+
 class EventPopup extends StatelessWidget {
   final Event event;
 
@@ -219,29 +221,77 @@ class EventPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        ListTile(
-          title: Text(event.title),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text('Date and Time: ${event.dateTime.toString()}'),
-              Text('Description: ${event.description}'),
-            ],
-          ),
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        width: MediaQuery.of(context).size.width * 0.8, // Adjust the width as needed
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              event.title,
+              style: TextStyle(
+                fontSize: 20, // Adjust the font size
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              'Date and Time: ${_formatDateTime(event.dateTime)}',
+              style: TextStyle(fontSize: 16), // Adjust the font size
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              'Description: ${event.description}',
+              style: TextStyle(fontSize: 16), // Adjust the font size
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the event detail page and pass the event object
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EventDetailPage(event: event),
+                ));
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.all(16.0), // Add padding all around the button
+                minimumSize: Size(200, 50), // Set a minimum button size
+              ),
+              child: Text(
+                'Go to Event',
+                style: TextStyle(fontSize: 18), // Adjust the button text font size
+              ),
+            ),
+          ],
         ),
-        ElevatedButton(
-  onPressed: () {
-    // Define the behavior when the "Go to Event" button is pressed.
-    // Navigate to the event view screen and pass the event object.
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => EventDetailPage( event: event),
-    ));
-  },
-  child: Text('Go to Event'),
-)
-      ],
+      ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final formattedDate = DateFormat.yMMMMd(dateTime);
+    return formattedDate;
+  }
+}
+
+class DateFormat {
+  static String yMMMMd(DateTime dateTime) {
+    final months = [
+      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December',
+    ];
+
+    final day = dateTime.day;
+    final month = months[dateTime.month - 1];
+    final year = dateTime.year;
+    final hour = dateTime.hour;
+    final minute = dateTime.minute;
+
+
+    return '$month $day, $year at $hour:$minute';
   }
 }
