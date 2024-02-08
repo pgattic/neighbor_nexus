@@ -1,6 +1,7 @@
 # neighbor_nexus
 https://discord.gg/ScK6pR7Q
-A new Flutter project.
+
+This is an app that allows people to share events with each other.
 
 ## Getting Started
 
